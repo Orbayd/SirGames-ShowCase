@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Resources", menuName = "ScriptableObjects/ResourceConfig", order = 1)]
-public class Resources : ScriptableObject
+[CreateAssetMenu(fileName = "ResourceConfig", menuName = "ScriptableObjects/ResourceConfig", order = 1)]
+public class ResourceConfig : ScriptableObject
 {
     [Header("Player")]
     public GameObject PlayerPrefab;

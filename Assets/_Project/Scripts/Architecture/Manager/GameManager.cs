@@ -1,26 +1,33 @@
 using SirGames.Showcase.Events;
+using SirGames.Showcase.GamePlay;
 using SirGames.Showcase.Helpers;
+using SirGames.Showcase.Services;
 using UnityEngine;
 
 namespace SirGames.Showcase.Managers
 {
     public class GameManager : MonoBehaviour
     {
-       
+        [Header("Configs")]
+
         [SerializeField]
-        private GameObject _player;
+        private ResourceConfig _resourceConfig;
+
+        [SerializeField]
+        private GameConfig _gameConfig;
 
         [Header("Managers")]
+
         [SerializeField]
         private TimerManager _timerManager;
 
         [SerializeField]
         private UIManager _uiManager;
 
-        [SerializeField]
-        private ResourceManager _resourceManager;
+        private ResourceService _resourceService;
 
         private int _score;
+        private int Score { get { return _score; } set { _score = value; OnScoreValueChanged(); } }
 
         private void Start()
         {
@@ -28,15 +35,21 @@ namespace SirGames.Showcase.Managers
         }
 
         private void Init()
-        {    
+        {
+            InitServices();
             InitManagers();
             InitCamera();
             AddEvents();
         }
 
-        public void InitManagers()
+        private void InitServices()
         {
-            _resourceManager.Init();
+            _resourceService = new ResourceService(_resourceConfig);
+        }
+
+        private void InitManagers()
+        {
+            _resourceService.Init();
             _uiManager.Init();
             _uiManager.Navigate(ViewName.Start);
         }
@@ -44,18 +57,19 @@ namespace SirGames.Showcase.Managers
         private void InitCamera()
         {
             var follow = Camera.main.GetComponent<FollowTarget>();
-            follow.SetTarget(_player.transform);
-            follow.SetOffset(new Vector2(10, 5));
+            follow.SetTarget(_resourceService.GetPlayer().transform);
+            follow.SetOffset(_gameConfig.CameraOffset);
         }
- 
+
         private void GiveReward(GameObject gameObject)
         {
-            _resourceManager.Release(gameObject);
-            _timerManager.Register(Random.Range(1, 5), () => _resourceManager.CreatePrize());
-            _score += 10;
-            MessageBus.Publish<GiveRewardEvent>(new GiveRewardEvent(_score));
-            
-            if (_score >= 100)
+            _resourceService.Release(gameObject);
+            _timerManager.Register(Random.Range(1, 5), () => _resourceService.CreatePrize());
+
+            Score += _gameConfig.ScoreGain;
+
+
+            if (Score >= _gameConfig.MaxScore)
             {
                 GameEnd();
             }
@@ -68,16 +82,21 @@ namespace SirGames.Showcase.Managers
 
         private void GameStart()
         {
-            _uiManager.Navigate(ViewName.ScoreBoard);      
-            _score = 0;
-            _player.transform.position = new Vector3(0.5f, 0.9f, -7.0f);
-            _resourceManager.CreatePrizes();
+            _uiManager.Navigate(ViewName.ScoreBoard);
+            Score = 0;
+            _resourceService.ResetPlayer();
+            _resourceService.CreatePrizes();
+        }
+
+        private void OnScoreValueChanged()
+        {
+            MessageBus.Publish<GiveRewardEvent>(new GiveRewardEvent(_score));
         }
 
         private void AddEvents()
         {
-            MessageBus.Subscribe<GameStartEvent>((x)=> GameStart());
-            MessageBus.Subscribe<PrepareRewardEvent>((x)=> GiveReward(x.Prize));
+            MessageBus.Subscribe<GameStartEvent>((x) => GameStart());
+            MessageBus.Subscribe<PrepareRewardEvent>((x) => GiveReward(x.Prize));
         }
 
         private void RemoveEvents()

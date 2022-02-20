@@ -1,10 +1,8 @@
 
 using System;
-using System.Windows.Input;
-using UnityEngine;
 
-namespace SirGames.Showcase.Managers
-{   
+namespace SirGames.Showcase.GamePlay
+{
     public interface IMoveCommand
     {
         void Execute();

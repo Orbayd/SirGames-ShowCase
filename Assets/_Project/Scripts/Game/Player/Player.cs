@@ -1,11 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SirGames.Showcase.Events;
 using SirGames.Showcase.Helpers;
 using UnityEngine;
 
-namespace SirGames.Showcase.Managers
+namespace SirGames.Showcase.GamePlay
 {
     [RequireComponent(typeof(CharacterController))]
     public class Player : MonoBehaviour
