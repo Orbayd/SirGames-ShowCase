@@ -9,12 +9,12 @@ namespace SirGames.Showcase.GamePlay
     [RequireComponent(typeof(CharacterController))]
     public class Player : MonoBehaviour
     {
+        [SerializeField]
+        private float _speed;
         private CharacterController _controller;
         private Quaternion _lookRotation;
         private Dictionary<MoveDirection, IMoveCommand> _moveCommands = new Dictionary<MoveDirection, IMoveCommand>();
 
-        [SerializeField]
-        private float _speed;
         private void Start()
         {
             _controller = GetComponent<CharacterController>();
