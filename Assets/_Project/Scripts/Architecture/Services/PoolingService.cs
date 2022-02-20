@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SirGames.Showcase.Services
 {
-    public class PoolingService
+    public class PoolingService : IService
     {
         private int _capacity;
         private int _size;

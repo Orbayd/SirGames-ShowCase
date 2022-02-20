@@ -3,7 +3,7 @@ using SirGames.Showcase.GamePlay;
 
 namespace SirGames.Showcase.Services
 {
-    public class ResourceService
+    public class ResourceService : IService
     { 
         public PoolingService PoolingService { get; private set; }
         private Player _player; 

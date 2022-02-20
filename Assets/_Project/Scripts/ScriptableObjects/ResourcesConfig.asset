@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 1487017850061926366, guid: 1592fc9fbf19445f8a8ec5436dfe210f,
     type: 3}
-  PlayerSpawnPosition: {x: 0.5, y: 0.9, z: -0.7}
+  PlayerSpawnPosition: {x: 0.5, y: 0.9, z: -9}
   PrizePrefab: {fileID: 7284077733067358955, guid: bdd5be7171f474410a8fc1c849bfceb7,
     type: 3}
   PrizeCount: 5
