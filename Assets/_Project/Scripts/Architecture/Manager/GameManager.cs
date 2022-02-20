@@ -1,66 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
-using SirGames.Showcase.Services;
-using SirGames.Showcase.UI;
+using SirGames.Showcase.Events;
+using SirGames.Showcase.Helpers;
 using UnityEngine;
 
 namespace SirGames.Showcase.Managers
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject _prefab;
-
+       
         [SerializeField]
         private GameObject _player;
 
+        [Header("Managers")]
         [SerializeField]
-        private Vector2 _spawnBounds;
+        private TimerManager _timerManager;
 
         [SerializeField]
-        public TimerManager _timerManager;
-        public PoolingService PoolingService { get; private set; }
-        public static GameManager Singleton { get; private set; }
+        private UIManager _uiManager;
 
         [SerializeField]
-        private ScoreBoardView ScoreBoardView;
-        private ScoreBoardViewModel ScoreBoardViewModel;
+        private ResourceManager _resourceManager;
 
-        [SerializeField]
-        private GameOverView GameOverView;
-        private GameOverViewModel GameOverViewModel;
-
-        [SerializeField]
-        private GameStartView GameStartView;
-        private GameStartViewModel GameStartViewModel ;
+        private int _score;
 
         private void Start()
         {
-            if (Singleton is null)
-            {
-                Singleton = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
-            
             Init();
         }
 
         private void Init()
         {    
-            InitServices();
-            InitUI();
+            InitManagers();
             InitCamera();
             AddEvents();
         }
 
-        private void InitServices()
+        public void InitManagers()
         {
-            PoolingService = new PoolingService(5, _prefab);
-            PoolingService.Init();
+            _resourceManager.Init();
+            _uiManager.Init();
+            _uiManager.Navigate(ViewName.Start);
         }
 
         private void InitCamera()
@@ -69,33 +47,15 @@ namespace SirGames.Showcase.Managers
             follow.SetTarget(_player.transform);
             follow.SetOffset(new Vector2(10, 5));
         }
-
-        private void InitUI()
+ 
+        private void GiveReward(GameObject gameObject)
         {
-            ScoreBoardViewModel = new ScoreBoardViewModel();
-            ScoreBoardView.Bind(ScoreBoardViewModel);
-          
-            GameOverViewModel = new GameOverViewModel(ScoreBoardViewModel);
-            GameOverView.Bind(GameOverViewModel);
-
-            GameStartViewModel = new GameStartViewModel();
-            GameStartView.Bind(GameStartViewModel);
-            GameStartView.Show(true);
-        }
-
-        private void Create()
-        {
-            var randomValue = Random.insideUnitCircle;
-            var pooledObject = PoolingService.Spawn(new Vector3(randomValue.x * _spawnBounds.x, 0.5f, randomValue.y * _spawnBounds.y), Vector3.zero);
-        }
-
-        public void GiveReward(GameObject gameObject)
-        {
-            PoolingService.Release(gameObject);
-            _timerManager.Register(Random.Range(1, 5), () => Create());
-            ScoreBoardViewModel.Score += 10;
-
-            if (ScoreBoardViewModel.Score >= 100)
+            _resourceManager.Release(gameObject);
+            _timerManager.Register(Random.Range(1, 5), () => _resourceManager.CreatePrize());
+            _score += 10;
+            MessageBus.Publish<GiveRewardEvent>(new GiveRewardEvent(_score));
+            
+            if (_score >= 100)
             {
                 GameEnd();
             }
@@ -103,37 +63,27 @@ namespace SirGames.Showcase.Managers
 
         private void GameEnd()
         {
-            ScoreBoardView.Show(false);
-            GameOverView.Show(true);
-            GameStartView.Show(false);
+            _uiManager.Navigate(ViewName.GameOver);
         }
 
         private void GameStart()
         {
-            ScoreBoardView.Show(true);
-            GameOverView.Show(false);
-            GameStartView.Show(false);
-
-            ScoreBoardViewModel.Score = 0;
-
+            _uiManager.Navigate(ViewName.ScoreBoard);      
+            _score = 0;
             _player.transform.position = new Vector3(0.5f, 0.9f, -7.0f);
-
-            for (int i = 0; i < 5; i++)
-            {
-                Create();
-            }
+            _resourceManager.CreatePrizes();
         }
 
         private void AddEvents()
         {
-            GameOverViewModel.OnButtonPlayAgainClicked += GameStart;
-            GameStartViewModel.OnButtonStartClicked += GameStart;
+            MessageBus.Subscribe<GameStartEvent>((x)=> GameStart());
+            MessageBus.Subscribe<PrepareRewardEvent>((x)=> GiveReward(x.Prize));
         }
 
         private void RemoveEvents()
         {
-            GameOverViewModel.OnButtonPlayAgainClicked -= GameStart;
-            GameStartViewModel.OnButtonStartClicked -= GameStart;
+            MessageBus.UnSubscribe<GameStartEvent>();
+            MessageBus.UnSubscribe<PrepareRewardEvent>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SirGames.Showcase.Events;
+using SirGames.Showcase.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,16 +15,13 @@ namespace SirGames.Showcase.UI
         {         
             _btnPlay.onClick.AddListener(() => model.ButtonPlayAgainClicked());
         }
-
     }
 
     public class GameStartViewModel : ViewModelBase
     {
-        public event Action OnButtonStartClicked;
-
         public void ButtonPlayAgainClicked()
         {
-            OnButtonStartClicked?.Invoke();
+            MessageBus.Publish(new GameStartEvent());
         }
     }
 }

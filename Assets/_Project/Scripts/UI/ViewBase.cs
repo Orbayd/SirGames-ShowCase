@@ -1,10 +1,14 @@
-﻿using UnityEngine;
-
+﻿
+using UnityEngine;
 namespace SirGames.Showcase.UI
 {
-    public abstract class ViewBase<TModel> : MonoBehaviour
+    public interface IView
     {
-        TModel DataContex;
+        void Show(bool value);
+    }
+    public abstract class ViewBase<TModel> : MonoBehaviour , IView where TModel : ViewModelBase
+    {
+        protected TModel DataContex {get; private set;}
 
         public void Show(bool value)
         {
@@ -18,8 +22,18 @@ namespace SirGames.Showcase.UI
         {
             DataContex = model;
             OnBind(model);
+            model.OnBind();
         }
 
         protected virtual void OnBind(TModel model) { }
+
+        public void UnBind(TModel model)
+        {
+            OnUnBind(model);
+            model.OnUnBind();
+            DataContex = null;
+        }
+
+        protected virtual void OnUnBind(TModel model) { }
     }
 }

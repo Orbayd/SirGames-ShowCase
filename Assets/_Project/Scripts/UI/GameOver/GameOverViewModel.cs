@@ -1,11 +1,10 @@
-﻿using System;
+﻿using SirGames.Showcase.Events;
+using SirGames.Showcase.Helpers;
 
 namespace SirGames.Showcase.UI
 {
     public class GameOverViewModel : ViewModelBase
     {
-        public event Action OnButtonPlayAgainClicked;
-
         private ScoreBoardViewModel _scoreBoardViewModel;
 
         public GameOverViewModel(ScoreBoardViewModel scoreBoardViewModel)
@@ -31,7 +30,7 @@ namespace SirGames.Showcase.UI
 
         public void ButtonPlayAgainClicked()
         {
-            OnButtonPlayAgainClicked?.Invoke();
+            MessageBus.Publish(new GameStartEvent());
         }
     }
 }

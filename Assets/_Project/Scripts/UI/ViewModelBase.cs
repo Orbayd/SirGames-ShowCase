@@ -14,5 +14,8 @@ namespace SirGames.Showcase.UI
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        public virtual void OnBind() { }
+        public virtual void OnUnBind() { }
     }
 }

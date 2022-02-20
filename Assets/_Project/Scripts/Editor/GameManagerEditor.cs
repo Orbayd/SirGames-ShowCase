@@ -19,20 +19,20 @@ public class GameManagerEditor : Editor
 
         if (GUILayout.Button("Create"))
         {
-            var pooledObject = ie.PoolingService.Spawn(Random.insideUnitCircle * 10.0f, Vector3.zero);
-            if (pooledObject != null)
-            {
-                _pooledObjects.Add(pooledObject);
-            }
+            // var pooledObject = ie..Spawn(Random.insideUnitCircle * 10.0f, Vector3.zero);
+            // if (pooledObject != null)
+            // {
+            //     _pooledObjects.Add(pooledObject);
+            // }
         }
         else if (GUILayout.Button("Release"))
         {
-            var pooledObject = _pooledObjects.FirstOrDefault();
-            if (pooledObject != null)
-            {
-                ie.PoolingService.Release(pooledObject);
-                _pooledObjects.Remove(pooledObject);
-            }
+            // var pooledObject = _pooledObjects.FirstOrDefault();
+            // if (pooledObject != null)
+            // {
+            //     ie.PoolingService.Release(pooledObject);
+            //     _pooledObjects.Remove(pooledObject);
+            // }
 
         }
 

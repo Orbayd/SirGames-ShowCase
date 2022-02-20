@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SirGames.Showcase.Events;
+using SirGames.Showcase.Helpers;
 using UnityEngine;
+
 namespace SirGames.Showcase.Managers
 {
     [RequireComponent(typeof(CharacterController))]
@@ -63,12 +66,8 @@ namespace SirGames.Showcase.Managers
             else if (touch.phase == TouchPhase.Moved)
             {
                 Debug.Log("[INFO] Touch Phase Moved");
-                
-                var angle =Vector2.Angle(touch.deltaPosition.normalized, new Vector2(0,1));
-
                 Debug.Log($"[INFO] DeltaPosition {touch.deltaPosition.normalized}");
-                Debug.Log($"[INFO] Angle {angle}");
-                
+                 
                  var normalized = touch.deltaPosition.normalized;
                 // float singleStep = 10 * Time.deltaTime;
                 // var newDirection = Vector3.RotateTowards(transform.forward, new Vector3(normalized.x,0,normalized.y), singleStep, 0.0f);
@@ -76,8 +75,7 @@ namespace SirGames.Showcase.Managers
                 //create the rotation we need to be in to look at the target
                 _lookRotation = Quaternion.LookRotation(new Vector3(normalized.x ,0, normalized.y));
                 transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * 2);
-                
-                
+                   
                 moveCommands[MoveDirection.Forward].Execute();
             }
             else if (touch.phase == TouchPhase.Ended)
@@ -88,7 +86,7 @@ namespace SirGames.Showcase.Managers
 
         private void OnTriggerEnter(Collider other)
         {
-            GameManager.Singleton.GiveReward(other.gameObject);
+            MessageBus.Publish<PrepareRewardEvent>(new PrepareRewardEvent(other.gameObject));
         }
     }
 }
